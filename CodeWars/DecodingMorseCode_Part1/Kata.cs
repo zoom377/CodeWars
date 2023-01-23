@@ -123,63 +123,11 @@ namespace CodeWars.DecodingMorseCode_Part1
         //57    0       -----   22222   242
 
 
-        const string charMap = " ET IA NM    SU RW    DK GO             HV F     L  PJ             BX CY    ZQ                                           54  3        2                          1                                        6                          7        8  90";
+        const string morseMap = " ET IA NM    SU RW    DK GO             HV F     L  PJ             BX CY    ZQ                                           54  3        2                          1                                        6                          7        8  90";
 
 
         public static string Decode(string morseCode)
         {
-            //243 - 36 = 207 wasted bytes
-            //But benchmarks say faster/less memory than dictionary
-            char[] morseMap = new char[243];
-            morseMap[1] = 'E';
-            morseMap[2] = 'T';
-            morseMap[4] = 'I';
-            morseMap[5] = 'A';
-            morseMap[7] = 'N';
-            morseMap[8] = 'M';
-            morseMap[13] = 'S';
-            morseMap[14] = 'U';
-            morseMap[16] = 'R';
-            morseMap[17] = 'W';
-            morseMap[22] = 'D';
-            morseMap[23] = 'K';
-            morseMap[25] = 'G';
-            morseMap[26] = 'O';
-            morseMap[40] = 'H';
-            morseMap[41] = 'V';
-            morseMap[43] = 'F';
-            morseMap[49] = 'L';
-            morseMap[52] = 'P';
-            morseMap[53] = 'J';
-            morseMap[67] = 'B';
-            morseMap[68] = 'X';
-            morseMap[70] = 'C';
-            morseMap[71] = 'Y';
-            morseMap[76] = 'Z';
-            morseMap[77] = 'Q';
-            morseMap[121] = '5';
-            morseMap[122] = '4';
-            morseMap[125] = '3';
-            morseMap[134] = '2';
-            morseMap[161] = '1';
-            morseMap[202] = '6';
-            morseMap[229] = '7';
-            morseMap[238] = '8';
-            morseMap[241] = '9';
-            morseMap[242] = '0';
-
-            StringBuilder mySB = new();
-            for (int i = 0; i < 243; i++)
-            {
-                char c = morseMap[i];
-                if (c == 0)
-                    mySB.Append(' ');
-                else
-                    mySB.Append(c);
-            }
-
-            Console.WriteLine(mySB.ToString());
-
             StringBuilder sb = new();
             int base3Val = 0;
             for (int i = 0; i < morseCode.Length + 1; i++)

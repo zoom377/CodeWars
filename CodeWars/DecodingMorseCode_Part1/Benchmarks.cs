@@ -14,8 +14,8 @@ namespace CodeWars.DecodingMorseCode_Part1
         [Benchmark]
         public void Decode() => MorseCodeDecoder.Decode(".... . -.--   .--- ..- -.. .");
 
-        [Benchmark]
-        public void DecodeDict() => MorseCodeDecoder.DecodeDict(".... . -.--   .--- ..- -.. .");
+        //[Benchmark]
+        //public void DecodeDict() => MorseCodeDecoder.DecodeDict(".... . -.--   .--- ..- -.. .");
 
     }
 }
