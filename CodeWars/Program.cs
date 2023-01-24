@@ -1,6 +1,7 @@
 ﻿using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
 using CodeWars.DecodingMorseCode_Part1;
+using Dia2Lib;
 using Perfolizer.Mathematics.Common;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,8 @@ namespace CodeWars
     {
         static void Main(string[] args)
         {
+
+            Console.WriteLine(MorseCodeGenerator.Generate("BUM SMELL!"));
 
             var testParams = new string[]
             {
@@ -46,6 +49,8 @@ namespace CodeWars
                 //MorseCodeGenerator.Generate("SOS"),
                 MorseCodeGenerator.Generate("I LIKE TO PLAY GUITAR"),
                 MorseCodeGenerator.Generate(" WAY   TOO      MUCH CODING    "),
+                "... --- ...",
+                "...---...",
             };
 
             //Console.WriteLine(MorseCodeDecoder.GenerateMorseMap());
@@ -56,16 +61,8 @@ namespace CodeWars
                 Console.WriteLine(val);
             }
 
-            //for (int i = 0; i < 256; i++)
-            //{
-            //    var res = MorseCodeGenerator.Generate($"{(char)i}");
-            //    Console.WriteLine($"{i}\t{res}");
-            //}
-
-            //var res = MorseCodeDecoder.Decode(".... . -.--   .--- ..- -.. .");
-            //Console.WriteLine(res);
-
-            //IConfig con = ConfigExtensions.WithOptions(DefaultConfig.Instance, ConfigOptions.DisableOptimizationsValidator);
+            Console.Write("Press any to start benchmark");
+            Console.Read();
             IConfig con = DefaultConfig.Instance.WithOptions(ConfigOptions.DisableOptimizationsValidator);
             BenchmarkRunner.Run<Benchmarks>(con);
 

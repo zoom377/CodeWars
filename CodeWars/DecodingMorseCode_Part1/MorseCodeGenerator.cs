@@ -51,6 +51,7 @@ namespace CodeWars.DecodingMorseCode_Part1
                 {'0',"-----"},
                 {'.',".-.-.-"},
                 {'!',"-.-.--"},
+                {'@',"SOS"},
                 {' '," "},
             };
 

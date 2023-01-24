@@ -186,7 +186,8 @@ namespace CodeWars.DecodingMorseCode_Part1
             return sb.ToString();
         }
 
-        const string morseMap = "\0\0ETINAMSDRGUKWOHBLZFCP#VX#Q#YJ#56#7###8#######9#4######3###2#10##########################################.##########!";
+        //const string morseMap = "\0\0ETINAMSDRGUKWOHBLZFCP#VX#Q#YJ#56#7###8#######9#4######3###2#10##########################################.##########!";
+        const string morseMap = "\0\0ETIANMSURWDKGOHVF#L#PJBXCYZQ##54#3###2#######16#######7###8#90#####################.#####################!";
         public static string Decode(string morseCode)
         {
             int start = 0, end = morseCode.Length - 1;
@@ -197,7 +198,7 @@ namespace CodeWars.DecodingMorseCode_Part1
 
             StringBuilder sb = new(morseCode.Length / 3 + 1);
             int charVal = 1;
-            for (int i = end; i >= start; i--)
+            for (int i = start; i <= end; i++)
             {
                 if (morseCode[i] == '.')
                 {
@@ -210,19 +211,20 @@ namespace CodeWars.DecodingMorseCode_Part1
                 }
                 else //morseCode[i] == ' '
                 {
-                    sb.Append(morseMap[charVal]);
-                    charVal = 1;
-                    for (int j = i-1; j >= start; j--)
-                    {
-                        char iChar = morseCode[i];
-                        char jChar = morseCode[j];
+                    if (charVal >= 256)
+                        sb.Append("SOS");
+                    else
+                        sb.Append(morseMap[charVal]);
 
-                        if ((i+1 - j) % 3 == 0)
+                    charVal = 1;
+                    for (int j = i+1; j <= end; j++)
+                    {
+                        if ((j - i + 1) % 3 == 0)
                             sb.Append(' ');
 
                         if (morseCode[j] != ' ')
                         {
-                            i = j + 1;
+                            i = j - 1;
                             break;
                         }
 
@@ -230,54 +232,56 @@ namespace CodeWars.DecodingMorseCode_Part1
                 }
             }
 
-            if (charVal > 1)
+            if (charVal >= 256)
+                sb.Append("SOS");
+            else
                 sb.Append(morseMap[charVal]);
 
-            return new string(sb.ToString().Reverse().ToArray());
+            return sb.ToString();
         }
 
         public static string GenerateMorseMap()
         {
             Dictionary<int, char> map = new()
             {
-                { 2,  'E' },
-                { 3,  'T' },
-                { 4,  'I' },
-                { 5,  'N' },
-                { 6,  'A' },
-                { 7,  'M' },
-                { 8,  'S' },
-                { 9,  'D' },
-                { 10, 'R' },
-                { 11, 'G' },
-                { 12, 'U' },
-                { 13, 'K' },
-                { 14, 'W' },
-                { 15, 'O' },
-                { 16, 'H' },
-                { 17, 'B' },
-                { 18, 'L' },
-                { 19, 'Z' },
-                { 20, 'F' },
-                { 21, 'C' },
-                { 22, 'P' },
-                { 24, 'V' },
-                { 25, 'X' },
-                { 27, 'Q' },
-                { 29, 'Y' },
-                { 30, 'J' },
-                { 32, '5' },
-                { 33, '6' },
-                { 35, '7' },
-                { 39, '8' },
-                { 47, '9' },
-                { 49, '4' },
-                { 56, '3' },
-                { 60, '2' },
-                { 62, '1' },
-                { 63, '0' },
-                { 106, '.' },
-                { 117, '!' }
+                { 2,   'E' },
+                { 3,   'T' },
+                { 4,   'I' },
+                { 5,   'A' },
+                { 6,   'N' },
+                { 7,   'M' },
+                { 8,   'S' },
+                { 9,   'U' },
+                { 10,  'R' },
+                { 11,  'W' },
+                { 12,  'D' },
+                { 13,  'K' },
+                { 14,  'G' },
+                { 15,  'O' },
+                { 16,  'H' },
+                { 17,  'V' },
+                { 18,  'F' },
+                { 20,  'L' },
+                { 22,  'P' },
+                { 23,  'J' },
+                { 24,  'B' },
+                { 25,  'X' },
+                { 26,  'C' },
+                { 27,  'Y' },
+                { 28,  'Z' },
+                { 29,  'Q' },
+                { 32,  '5' },
+                { 33,  '4' },
+                { 35,  '3' },
+                { 39,  '2' },
+                { 47,  '1' },
+                { 48,  '6' },
+                { 56,  '7' },
+                { 60,  '8' },
+                { 62,  '9' },
+                { 63,  '0' },
+                { 85,  '.' },
+                { 107, '!' }
             };
 
             StringBuilder sb = new();
