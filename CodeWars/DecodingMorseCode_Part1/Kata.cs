@@ -123,116 +123,174 @@ namespace CodeWars.DecodingMorseCode_Part1
         //57    0       -----   22222   242
 
 
-        const string morseMap = " ET IA NM    SU RW    DK GO             HV F     L  PJ             BX CY    ZQ                                           54  3        2                          1                                        6                          7        8  90";
 
+        const string morseMapAlt = $"0ET\0IA\0NM\0\0\0\0SU\0RW\0\0\0\0DK\0GO\0\0\0\0\0\0\0\0\0\0\0\0\0HV\0F\0\0\0\0\0L\0\0PJ\0\0\0\0\0\0\0\0\0\0\0\0\0BX\0CY\0\0\0\0ZQ\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\054\0\03\0\0\0\0\0\0\0\02\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0!\0\0\0\0\0\0\0\0\0\01\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\06\0\0\0\0\0\0\0\0\0\0.\0\0\0\0\0\0\0\0\0\0\0\0\0\0\07\0\0\0\0\0\0\0\08\0\09";
 
-        public static string Decode(string morseCode)
+        //Dictionary can't be const so we use string instead as a map.
+        //About 1/3rd of the memory of a dictionary, 1/10th of the run time (according to benchmarkdotnet)
+        const string oldMorseMap = $"\0ET\0IA\0NM\0\0\0\0SU\0RW\0\0\0\0DK\0GO\0\0\0\0\0\0\0\0\0\0\0\0\0HV\0F\0\0\0\0\0L\0\0PJ\0\0\0\0\0\0\0\0\0\0\0\0\0BX\0CY\0\0\0\0ZQ\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\054\0\03\0\0\0\0\0\0\0\02\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\01\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\06\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\07\0\0\0\0\0\0\0\08\0\090";
+        public static string DecodeOld(string morseCode)
         {
+            int start = 0, end = morseCode.Length - 1;
+            while (start < end && morseCode[start] == ' ')
+                start++;
+            while (end > start && morseCode[end] == ' ')
+                end--;
+
             StringBuilder sb = new();
             int base3Val = 0;
-            for (int i = 0; i < morseCode.Length + 1; i++)
+            for (int i = start; i <= end; i++)
             {
-                if (i >= morseCode.Length || morseCode[i] == ' ')
+                if (morseCode[i] == '.')
+                {
+                    base3Val *= 3;//Move to next digit of base3 number. If currentChar is 0, this has no effect.
+                    base3Val += 1;
+                }
+                else if (morseCode[i] == '-')
+                {
+                    base3Val *= 3;
+                    base3Val += 2;
+                }
+                else //morseCode[i] == ' '
                 {
                     //End of morse character sequence reached
-                    sb.Append(morseMap[base3Val]);
+                    if (base3Val < 243)
+                        sb.Append(oldMorseMap[base3Val]);
+                    else if (base3Val == 455)
+                        sb.Append(".");
+                    else if (base3Val == 634)
+                        sb.Append("!");
+                    else if (base3Val == 10192)
+                        sb.Append("SOS");
+
                     base3Val = 0;
-                    if (i < morseCode.Length && morseCode[i + 1] == ' ')
+                    if (i <= end - 3 && morseCode[i + 1] == ' ')
                     {
                         i += 2;
                         sb.Append(' ');
                     }
 
-                    continue;
                 }
-
-                //Move to next digit of base3 number. If currentChar is 0, this has no effect.
-                base3Val *= 3;
-
-                if (morseCode[i] == '.')
-                    base3Val += 1;
-
-                if (morseCode[i] == '-')
-                    base3Val += 2;
             }
+
+            //Add final char
+            if (base3Val < 243)
+                sb.Append(oldMorseMap[base3Val]);
+            else if (base3Val == 455)
+                sb.Append(".");
+            else if (base3Val == 634)
+                sb.Append("!");
+            else if (base3Val == 10192)
+                sb.Append("SOS");
 
             return sb.ToString();
         }
 
-        public static string DecodeDict(string morseCode)
+        const string morseMap = "\0\0ETINAMSDRGUKWOHBLZFCP#VX#Q#YJ#56#7###8#######9#4######3###2#10##########################################.##########!";
+        public static string Decode(string morseCode)
         {
-            //243 - 36 = 207 wasted bytes
-            //But maybe faster than dictionary
-            //char[] morseMap = new char[243];
-            Dictionary<int, char> morseMap = new()
-            {
-                {1, 'E'},
-                {2, 'T'},
-                {4, 'I'},
-                {5, 'A'},
-                {7, 'N'},
-                {8, 'M'},
-                {13, 'S'},
-                {14, 'U'},
-                {16, 'R'},
-                {17, 'W'},
-                {22, 'D'},
-                {23, 'K'},
-                {25, 'G'},
-                {26, 'O'},
-                {40, 'H'},
-                {41, 'V'},
-                {43, 'F'},
-                {49, 'L'},
-                {52, 'P'},
-                {53, 'J'},
-                {67, 'B'},
-                {68, 'X'},
-                {70, 'C'},
-                {71, 'Y'},
-                {76, 'Z'},
-                {77, 'Q'},
-                {121, '5'},
-                {122, '4'},
-                {125, '3'},
-                {134, '2'},
-                {161, '1'},
-                {202, '6'},
-                {229, '7'},
-                {238, '8'},
-                {241, '9'},
-                {242, '0'},
-        };
+            int start = 0, end = morseCode.Length - 1;
+            while (start < end && morseCode[start] == ' ')
+                start++;
+            while (end > start && morseCode[end] == ' ')
+                end--;
 
-            //MorseCodeDecoder.Decode(".... . -.--   .--- ..- -.. .")
-            //should return "HEY JUDE"
+            StringBuilder sb = new(morseCode.Length / 3 + 1);
+            int charVal = 1;
+            for (int i = end; i >= start; i--)
+            {
+                if (morseCode[i] == '.')
+                {
+                    charVal <<= 1;
+                }
+                else if (morseCode[i] == '-')
+                {
+                    charVal <<= 1;
+                    charVal++;
+                }
+                else //morseCode[i] == ' '
+                {
+                    sb.Append(morseMap[charVal]);
+                    charVal = 1;
+                    for (int j = i-1; j >= start; j--)
+                    {
+                        char iChar = morseCode[i];
+                        char jChar = morseCode[j];
+
+                        if ((i+1 - j) % 3 == 0)
+                            sb.Append(' ');
+
+                        if (morseCode[j] != ' ')
+                        {
+                            i = j + 1;
+                            break;
+                        }
+
+                    }
+                }
+            }
+
+            if (charVal > 1)
+                sb.Append(morseMap[charVal]);
+
+            return new string(sb.ToString().Reverse().ToArray());
+        }
+
+        public static string GenerateMorseMap()
+        {
+            Dictionary<int, char> map = new()
+            {
+                { 2,  'E' },
+                { 3,  'T' },
+                { 4,  'I' },
+                { 5,  'N' },
+                { 6,  'A' },
+                { 7,  'M' },
+                { 8,  'S' },
+                { 9,  'D' },
+                { 10, 'R' },
+                { 11, 'G' },
+                { 12, 'U' },
+                { 13, 'K' },
+                { 14, 'W' },
+                { 15, 'O' },
+                { 16, 'H' },
+                { 17, 'B' },
+                { 18, 'L' },
+                { 19, 'Z' },
+                { 20, 'F' },
+                { 21, 'C' },
+                { 22, 'P' },
+                { 24, 'V' },
+                { 25, 'X' },
+                { 27, 'Q' },
+                { 29, 'Y' },
+                { 30, 'J' },
+                { 32, '5' },
+                { 33, '6' },
+                { 35, '7' },
+                { 39, '8' },
+                { 47, '9' },
+                { 49, '4' },
+                { 56, '3' },
+                { 60, '2' },
+                { 62, '1' },
+                { 63, '0' },
+                { 106, '.' },
+                { 117, '!' }
+            };
 
             StringBuilder sb = new();
-            int base3Val = 0;
-            for (int i = 0; i < morseCode.Length + 1; i++)
+            for (int i = 0; i < 256; i++)
             {
-                if (i >= morseCode.Length || morseCode[i] == ' ')
+                if (map.ContainsKey(i))
                 {
-                    //End of morse character sequence reached
-                    sb.Append(morseMap[base3Val]);
-                    base3Val = 0;
-                    if (i < morseCode.Length && morseCode[i + 1] == ' ')
-                    {
-                        i += 2;
-                        sb.Append(' ');
-                    }
-
-                    continue;
+                    sb.Append(map[i]);
                 }
-
-                //Move to next digit of base3 number. If currentChar is 0, this has no effect.
-                base3Val *= 3;
-
-                if (morseCode[i] == '.')
-                    base3Val += 1;
-
-                if (morseCode[i] == '-')
-                    base3Val += 2;
+                else
+                {
+                    sb.Append('#');
+                }
             }
 
             return sb.ToString();
