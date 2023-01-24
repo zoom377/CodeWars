@@ -15,6 +15,8 @@ namespace CodeWars
         {
             var rudeMorseCode = MorseCodeGenerator.Generate("BUM SMELL!");
             Console.WriteLine(rudeMorseCode);
+
+            WAVGenerator.Generate(rudeMorseCode);
             MorseCodePlayer.Play(rudeMorseCode);
 
             var testParams = new string[]
