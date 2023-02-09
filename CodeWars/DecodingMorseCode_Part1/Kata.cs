@@ -9,6 +9,8 @@ namespace CodeWars.DecodingMorseCode_Part1
     class MorseCodeDecoder
     {
 
+        //IDEA 1:
+
         //Maybe morse code can be represented with base 3 numbers.
         //English letters can be represented with up to 4 morse code digits.
 
@@ -42,6 +44,7 @@ namespace CodeWars.DecodingMorseCode_Part1
         //00100 = 9
         //01000 = 27
         //10000 = 81
+
 
         //Converted to Base3 (right padded with zeros)
         //Code  Char    Morse   Base3   Decimal
@@ -122,72 +125,22 @@ namespace CodeWars.DecodingMorseCode_Part1
         //56    9       ----.   22221   241
         //57    0       -----   22222   242
 
+        // ^^^ Above idea didn't quite work ^^^
 
 
-        const string morseMapAlt = $"0ET\0IA\0NM\0\0\0\0SU\0RW\0\0\0\0DK\0GO\0\0\0\0\0\0\0\0\0\0\0\0\0HV\0F\0\0\0\0\0L\0\0PJ\0\0\0\0\0\0\0\0\0\0\0\0\0BX\0CY\0\0\0\0ZQ\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\054\0\03\0\0\0\0\0\0\0\02\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0!\0\0\0\0\0\0\0\0\0\01\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\06\0\0\0\0\0\0\0\0\0\0.\0\0\0\0\0\0\0\0\0\0\0\0\0\0\07\0\0\0\0\0\0\0\08\0\09";
+
+        //IDEA 2:
+        //Binary search tree
+        //See: https://en.wikipedia.org/wiki/Morse_code#/media/File:Morse_code_tree3.png
+        //https://www.codewars.com/kata/decode-the-morse-code/elm
+
+
+
 
         //Dictionary can't be const so we use string instead as a map.
         //About 1/3rd of the memory of a dictionary, 1/10th of the run time (according to benchmarkdotnet)
-        const string oldMorseMap = $"\0ET\0IA\0NM\0\0\0\0SU\0RW\0\0\0\0DK\0GO\0\0\0\0\0\0\0\0\0\0\0\0\0HV\0F\0\0\0\0\0L\0\0PJ\0\0\0\0\0\0\0\0\0\0\0\0\0BX\0CY\0\0\0\0ZQ\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\054\0\03\0\0\0\0\0\0\0\02\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\01\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\06\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\07\0\0\0\0\0\0\0\08\0\090";
-        public static string DecodeOld(string morseCode)
-        {
-            int start = 0, end = morseCode.Length - 1;
-            while (start < end && morseCode[start] == ' ')
-                start++;
-            while (end > start && morseCode[end] == ' ')
-                end--;
-
-            StringBuilder sb = new();
-            int base3Val = 0;
-            for (int i = start; i <= end; i++)
-            {
-                if (morseCode[i] == '.')
-                {
-                    base3Val *= 3;//Move to next digit of base3 number. If currentChar is 0, this has no effect.
-                    base3Val += 1;
-                }
-                else if (morseCode[i] == '-')
-                {
-                    base3Val *= 3;
-                    base3Val += 2;
-                }
-                else //morseCode[i] == ' '
-                {
-                    //End of morse character sequence reached
-                    if (base3Val < 243)
-                        sb.Append(oldMorseMap[base3Val]);
-                    else if (base3Val == 455)
-                        sb.Append(".");
-                    else if (base3Val == 634)
-                        sb.Append("!");
-                    else if (base3Val == 10192)
-                        sb.Append("SOS");
-
-                    base3Val = 0;
-                    if (i <= end - 3 && morseCode[i + 1] == ' ')
-                    {
-                        i += 2;
-                        sb.Append(' ');
-                    }
-
-                }
-            }
-
-            //Add final char
-            if (base3Val < 243)
-                sb.Append(oldMorseMap[base3Val]);
-            else if (base3Val == 455)
-                sb.Append(".");
-            else if (base3Val == 634)
-                sb.Append("!");
-            else if (base3Val == 10192)
-                sb.Append("SOS");
-
-            return sb.ToString();
-        }
-
-        //const string morseMap = "\0\0ETINAMSDRGUKWOHBLZFCP#VX#Q#YJ#56#7###8#######9#4######3###2#10##########################################.##########!";
         const string morseMap = "\0\0ETIANMSURWDKGOHVF#L#PJBXCYZQ##54#3###2#######16#######7###8#90#####################.#####################!";
+
         public static string Decode(string morseCode)
         {
             int start = 0, end = morseCode.Length - 1;
@@ -196,8 +149,11 @@ namespace CodeWars.DecodingMorseCode_Part1
             while (end > start && morseCode[end] == ' ')
                 end--;
 
+            //The trick to getting this bit-shift technique to work was to
+            //  always add 1 before processing each morse code char grouping
+
             StringBuilder sb = new(morseCode.Length / 3 + 1);
-            int charVal = 1;
+            int charVal = 1; //After each group of morse code symbols is processed, charVal indexes morseMap, hopefully returning the correct english letter.
             for (int i = start; i <= end; i++)
             {
                 if (morseCode[i] == '.')
@@ -211,6 +167,7 @@ namespace CodeWars.DecodingMorseCode_Part1
                 }
                 else //morseCode[i] == ' '
                 {
+                    //SOS sometimes comes in one large grouping: "...---..." with no spacing. This is a special case that requires handling
                     if (charVal >= 256)
                         sb.Append("SOS");
                     else
@@ -240,6 +197,7 @@ namespace CodeWars.DecodingMorseCode_Part1
             return sb.ToString();
         }
 
+        //Used while building the morse map string above.
         public static string GenerateMorseMap()
         {
             Dictionary<int, char> map = new()
@@ -299,5 +257,66 @@ namespace CodeWars.DecodingMorseCode_Part1
 
             return sb.ToString();
         }
+        
+        
+        
+        
+        //const string oldMorseMap = $"\0ET\0IA\0NM\0\0\0\0SU\0RW\0\0\0\0DK\0GO\0\0\0\0\0\0\0\0\0\0\0\0\0HV\0F\0\0\0\0\0L\0\0PJ\0\0\0\0\0\0\0\0\0\0\0\0\0BX\0CY\0\0\0\0ZQ\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\054\0\03\0\0\0\0\0\0\0\02\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\01\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\06\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\07\0\0\0\0\0\0\0\08\0\090";
+        //public static string DecodeOld(string morseCode)
+        //{
+        //    int start = 0, end = morseCode.Length - 1;
+        //    while (start < end && morseCode[start] == ' ')
+        //        start++;
+        //    while (end > start && morseCode[end] == ' ')
+        //        end--;
+
+        //    StringBuilder sb = new();
+        //    int base3Val = 0;
+        //    for (int i = start; i <= end; i++)
+        //    {
+        //        if (morseCode[i] == '.')
+        //        {
+        //            base3Val *= 3;//Move to next digit of base3 number. If currentChar is 0, this has no effect.
+        //            base3Val += 1;
+        //        }
+        //        else if (morseCode[i] == '-')
+        //        {
+        //            base3Val *= 3;
+        //            base3Val += 2;
+        //        }
+        //        else //morseCode[i] == ' '
+        //        {
+        //            //End of morse character sequence reached
+        //            if (base3Val < 243)
+        //                sb.Append(oldMorseMap[base3Val]);
+        //            else if (base3Val == 455)
+        //                sb.Append(".");
+        //            else if (base3Val == 634)
+        //                sb.Append("!");
+        //            else if (base3Val == 10192)
+        //                sb.Append("SOS");
+
+        //            base3Val = 0;
+        //            if (i <= end - 3 && morseCode[i + 1] == ' ')
+        //            {
+        //                i += 2;
+        //                sb.Append(' ');
+        //            }
+
+        //        }
+        //    }
+
+        //    //Add final char
+        //    if (base3Val < 243)
+        //        sb.Append(oldMorseMap[base3Val]);
+        //    else if (base3Val == 455)
+        //        sb.Append(".");
+        //    else if (base3Val == 634)
+        //        sb.Append("!");
+        //    else if (base3Val == 10192)
+        //        sb.Append("SOS");
+
+        //    return sb.ToString();
+        //}
     }
 }
